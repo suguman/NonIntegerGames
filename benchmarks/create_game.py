@@ -1,3 +1,11 @@
+## ============================================================================
+# Name        : create_game.py
+# Author      : Andrew Wells
+# Version     :
+# Copyright   : Your copyright notice
+# Description : Robotics benchmark
+## ============================================================================
+
 import sys
 
 class Location:
