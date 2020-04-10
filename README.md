@@ -33,4 +33,4 @@ Dependencies
 
 Run
 ---------------------
-    python3 create_game <num rows> <num_cols> <pos_reward> <neg_reward>
+    python3 create_game.py <num rows> <num_cols> <pos_reward> <neg_reward>
