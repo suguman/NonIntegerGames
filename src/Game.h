@@ -24,6 +24,12 @@ class Game{
   //playing game
   bool reachabilitygame(int player);
   
+  //Modify winning
+  void modifywinning(string state, string gotostate);
+  
+  //Print winning strategie function(s)
+  void rawprint(int player);
+  
   //Access functions
   string getInitial();
   unordered_map<string, string>* getWinning();
@@ -39,9 +45,6 @@ class Game{
   void printRevTrans();
   void printAll();
 
-  //Modify winning
-  void modifywinning(string state, string gotostate);
-  
   
  private:
   string initial;

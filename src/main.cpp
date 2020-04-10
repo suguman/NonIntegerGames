@@ -2,7 +2,6 @@
 #include "Game.h"
 #include "Graph.h"
 #include "Transition.h"
-//#include "utils.h"
 
 static struct opt_t
 {
@@ -160,8 +159,8 @@ int  main(int argc, char** argv){
   else{
     cout << "Player " << opt->playerid << " wins " <<  endl;
     if (opt->synthesis){
-      //qg->extractwinnignstrategy()
-      cout << "TODO " << endl;
+      qg->rawprint(opt->playerid);
+
     }
   }
   

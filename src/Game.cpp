@@ -60,7 +60,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 
   
   int resolution_inverse = int(pow(2, df+precision));
-  
+  int dffactor = int(pow(2, df));
   //******* End: Initialize********//
 
 
@@ -131,9 +131,8 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
     
       int wt = trans->getWt();
 
-      //TODO:: Calculate
       int next_comparator = 0;
-      int next_comparator_temp = cur_comparator + wt*resolution_inverse + int(cur_comparator/pow(2,df));
+      int next_comparator_temp = cur_comparator + wt*resolution_inverse + int(cur_comparator/dffactor);
       if (next_comparator_temp > upperbound){
 	next_comparator = upperbound;
       }
@@ -363,3 +362,35 @@ bool Game::reachabilitygame(int player){
   return false;
 }
 
+void Game::rawprint(int player){
+
+  unordered_map<string, string>* wmap = this->getWinning();
+  unordered_map<string, int>* ptosmap = this->getStateToPlayer();
+
+  string state;
+  string deststate;
+  vector<string> scomp = {};
+  vector<string>  dcomp = {};
+  int temp;
+  
+  unordered_map<string, string> :: iterator p;
+  for(p = wmap->begin(); p != wmap->end(); p++){
+    state = p->first;
+    if (ptosmap->at(state) == player){
+      scomp = split(state);
+      deststate = wmap->at(state);
+      dcomp = split(deststate);
+      temp  = dcomp.size(); 
+      if (temp == 2){
+	cout << scomp[0] << ", " << scomp[1] << " --> " << dcomp[0] << ", " << dcomp[1] << endl; 
+      }
+      if (temp  == 1){
+	cout << scomp[0] << ", " << scomp[1] << " --> "  << "Any action" << endl;
+      }
+      if (temp == 0){
+	cout << scomp[0] << ", " << scomp[1] << " --> " << "Non-winning state" << endl;
+      }
+    }
+  }
+  
+}
