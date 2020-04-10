@@ -14,7 +14,7 @@ Compile and run
 
 Make source: 
 
-    cd src
+    cd src/
     make
     
 Pull up the -help options:   
@@ -33,4 +33,5 @@ Dependencies
 
 Run
 ---------------------
+    cd benchmarks/
     python3 create_game.py <num rows> <num_cols> <pos_reward> <neg_reward>
