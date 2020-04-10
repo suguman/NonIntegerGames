@@ -17,7 +17,7 @@ Make source:
     cd src
     make
     
-Pull the -help option:   
+Pull up the -help options:   
     
     ./game -h
     
