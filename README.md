@@ -24,3 +24,13 @@ Pull up the -help options:
 Example run:
     
     ./game -f ../benchmarks/eg1.txt -df 2 -p 1 -id 0 -syn
+    
+# Robotics benchmarks
+
+Dependencies
+---------------------
+* python3
+
+Run
+---------------------
+    python3 create_game <num rows> <num_cols> <pos_reward> <neg_reward>
