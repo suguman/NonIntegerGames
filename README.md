@@ -9,7 +9,7 @@ Install Boost
     
     sudo apt-get install libboost-dev
     
-Compiling Run
+Compile and run
 ---------------------
 
 Make source: 
@@ -17,7 +17,7 @@ Make source:
     cd src
     make
     
-pull the -help option:   
+Pull the -help option:   
     
     ./game -h
     
