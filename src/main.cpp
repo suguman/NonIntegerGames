@@ -18,13 +18,13 @@ static struct opt_t
 
 
 void print_opt(){
-  cout << "Filename is        " << opt->filename << endl;
-  cout << "Discount factor is " << opt->df << endl;
-  cout << "Precision is       " << opt->precision << endl;
-  cout << "Treshold is        " << opt->thresh << endl;
-  cout << "Relation is        " << opt->relation << endl;
-  cout << "Synthesis is       " << opt->synthesis << endl;
-  cout << "Player id is       " << opt->playerid << endl;
+  cout << "Filename          : " << opt->filename << endl;
+  cout << "Discount factor   : " << "1+2^-" << opt->df << endl;
+  cout << "Precision         : " << "2^-" << opt->precision << endl;
+  cout << "Treshold          : " << opt->thresh << endl;
+  cout << "Relation          : " << opt->relation << endl;
+  //cout << "Synthesis is       " << opt->synthesis << endl;
+  cout << "Player id         : " << opt->playerid << endl;
 }
 
 void print_usage(){
@@ -144,15 +144,34 @@ int  main(int argc, char** argv){
   print_opt();
 
   //create game graph from file
+
   Graph* gg = new Graph(opt->filename);
-  gg->printAll();
+  //gg->printAll();
 
   //create and solve reachability game
+
+  clock_t creategraph_s = clock();
   Game* qg = new Game(gg, opt->df, opt->precision, opt->thresh, opt->relation);
-  qg->printAll();
-  qg->printRevTrans();
+  clock_t creategraph_e = clock();
+  double creategraph = ((double) (creategraph_e- creategraph_s)) / CLOCKS_PER_SEC;
   
+  //qg->printAll();
+  //qg->printRevTrans();
+
+  //cout << "Created game" << endl;
+
+  clock_t playgame_s = clock();
   bool playerwins = qg->reachabilitygame(opt->playerid);
+  clock_t playgame_e = clock();
+  double playgame = ((double) (playgame_e- playgame_s)) / CLOCKS_PER_SEC;
+
+  cout << " " << endl;
+  cout << "Input quant. game : " << gg->getStateNum() << " states " << endl;
+  cout << "Reachability game : " << qg->getallstates() << " states " << endl;
+  cout << "Game creation     : " <<  creategraph << " seconds" << endl;
+  cout << "Game play         : " <<  playgame << " seconds" << endl;
+  cout << " " << endl;
+    
   if (!playerwins){
     cout << "Player " << opt->playerid << " does not win" <<  endl;
   }
@@ -163,7 +182,7 @@ int  main(int argc, char** argv){
 
     }
   }
-  
+
   return 0;
 }
 

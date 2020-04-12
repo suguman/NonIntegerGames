@@ -36,6 +36,7 @@ class Game{
   unordered_map<string, int>* getStateToPlayer();
   unordered_map<string, vector<string>>* getTrans();
   unordered_map<string, vector<string>>* getRevTrans();
+  int getallstates();
   
   //Print functions
   void printInitial();
@@ -43,8 +44,9 @@ class Game{
   void printStoPlayer();
   void printTrans();
   void printRevTrans();
+  void printstatenum();
   void printAll();
-
+  
   
  private:
   string initial;
@@ -52,7 +54,7 @@ class Game{
   unordered_map<string, int> stateToPlayer;
   unordered_map<string, vector<string>> transFunc;
   unordered_map<string, vector<string>> reverseFunc;
-  
+  int allstates;
 };
 
 

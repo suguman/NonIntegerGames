@@ -15,7 +15,7 @@ using namespace std;
 
 string stringify(int graph_state, int comp_state){
   string sep = "_";
-  cout << to_string(graph_state) + sep + to_string(comp_state) << endl;
+  //cout << to_string(graph_state) + sep + to_string(comp_state) << endl;
   return to_string(graph_state) + sep + to_string(comp_state);
 }
 
@@ -38,6 +38,7 @@ Game::Game(){
   this->stateToPlayer = {};
   this->transFunc = {};
   this->reverseFunc = {};
+  this->allstates = 0;
 }
 
 
@@ -50,14 +51,15 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   this->stateToPlayer = {};
   this->transFunc = {};
   this->reverseFunc = {};
-
+  this->allstates  = 0;
+  
   unordered_map<int, vector<Transition*>>* transF = gg->getTrans();
   unordered_map<int, int>* statePlayerID = gg->getStateToPlayer();
   unordered_map<string, int> statetoplayeraux = {};
   unordered_map<string, vector<string>> transfuncaux = {};
   unordered_map<string, vector<string>> reversefuncaux = {};
   unordered_map<string, string> winningaux = {};
-
+  int numstategame = 0;
   
   int resolution_inverse = int(pow(2, df+precision));
   int dffactor = int(pow(2, df));
@@ -77,14 +79,14 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   int lowerbound = -1*maxWt*res_temp;
   int upperbound = 1*maxWt*res_temp + int(pow(2,df));
 
-  cout << "Lower bound is " << lowerbound << endl;
-  cout << "Upper bound is " << upperbound << endl;
+  cout << "Comparator range  : " << lowerbound << " to " << upperbound << endl;
   
   //******* End: Get bounds for comparator automata*********//
 
   // ******* Begin : initial state of game ********//
   string init = stringify(gg->getInitial(), 0);
   this->initial = init; 
+
   // ******* End : initial state of game ********//
 
   
@@ -97,6 +99,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 
   //Special state : init
   statestack.push(init);
+  numstategame += 1;
   isstate[init] = true;
   statetoplayeraux[init] = statePlayerID->at(gg->getInitial());
   winningaux[init] = "";
@@ -104,13 +107,13 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   while(!statestack.empty()){
     string state = statestack.front();
     statestack.pop();
-    cout << "State being explored is " << state << endl;
-    cout << "State belongs to player " << statetoplayeraux[state] << endl;
+    //cout << "State being explored is " << state << endl;
+    //cout << "State belongs to player " << statetoplayeraux[state] << endl;
     //Parts of current state
     vector<string> statetemp = split(state);
     int cur_state = stoi(statetemp[0]);
     int cur_comparator  = stoi(statetemp[1]);
-    cout << "game state is " << cur_state << ", comp state is " << cur_comparator << endl;
+    //cout << "game state is " << cur_state << ", comp state is " << cur_comparator << endl;
 
     //Used to store all outgoing neighbours
     vector<string> deststatelist = {};
@@ -118,7 +121,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
     vector<Transition*> translist = transF->at(cur_state);
 
     for(auto &trans : translist){
-      trans->toString();
+      //trans->toString();
 
       //*****Begin: Make new state*****//
       // (a). Find the next state in the graph
@@ -145,7 +148,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
       
       // Make the destination state using (a) and (b)
       string new_state = stringify(next_src, next_comparator);
-      cout << "The new state is " << new_state << endl;
+      //cout << "The new state is " << new_state << endl;
       deststatelist.push_back(new_state);
       
       //*****End: Make new state*****//
@@ -172,6 +175,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 	}
 	//cout << "Length of statestack before insertion is " << statestack.size() << endl;
 	statestack.push(new_state);
+	numstategame += 1;
 	//cout << "Length of statestack after insertion is " << statestack.size() << endl;
       }
     }
@@ -197,6 +201,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   }
   this->reverseFunc = reversefuncaux;
   this->winning = winningaux;
+  this->allstates = numstategame;
 }
 
 Game::~Game(){
@@ -221,6 +226,10 @@ unordered_map<string, vector<string>>* Game::getTrans(){
 
 unordered_map<string, vector<string>>* Game::getRevTrans(){
   return &(this->reverseFunc);
+}
+
+int Game::getallstates(){
+  return this->allstates;
 }
 
 void Game::printInitial(){
@@ -275,6 +284,9 @@ void Game::printRevTrans(){
   }
 }
 
+void Game::printstatenum(){
+  cout << this->allstates << endl;
+}
 
 void Game::printAll(){
   printInitial();
@@ -285,7 +297,7 @@ void Game::printAll(){
 
 void Game::modifywinning(string state, string gotostate){
   (this->winning)[state] = gotostate;
-  cout << "From " << state << " go to " << gotostate << endl;
+  //cout << "From " << state << " go to " << gotostate << endl;
 }
 
 bool Game::reachabilitygame(int player){
@@ -313,7 +325,7 @@ bool Game::reachabilitygame(int player){
     
   while(!statestack.empty()){ 
     string state = statestack.front();
-    cout << "Currently evaluating winning state  " << state << endl;
+    //cout << "Currently evaluating winning state  " << state << endl;
     statestack.pop();
     vector<string> revtranslist;
     try{
@@ -323,9 +335,9 @@ bool Game::reachabilitygame(int player){
       continue;
     }
     for(auto & element : revtranslist){
-      cout << "Is state "<< element << " winning?" <<endl;
+      //cout << "Is state "<< element << " winning?" <<endl;
       int statebelongsto = statetoplayer->at(element);
-      cout << "State belongs to " << statebelongsto << endl;
+      //cout << "State belongs to " << statebelongsto << endl;
       if (statebelongsto == player){
 	//then element is a  winning state.	
 	//if element hasn't been visited before, then add to stack. 
@@ -334,7 +346,7 @@ bool Game::reachabilitygame(int player){
 	  statestack.push(element);
 	  numtrans[element] = 0;
 	  this->modifywinning(element, state);
-	  cout << "State " << element << " is winning." << endl;
+	  //cout << "State " << element << " is winning." << endl;
 	}
 	if (element == initial){
 	    //player has won, as it is visiting  initial state, controlled by the player
@@ -345,12 +357,12 @@ bool Game::reachabilitygame(int player){
 	// element will be winning only when numtans turns 0
 	// add element to stack only the first time numtrans turns 0
 	if (numtrans[element] != 0){
-	  cout << element << " numtrans is " << numtrans[element] << endl;
+	  //cout << element << " numtrans is " << numtrans[element] << endl;
 	  numtrans[element] = numtrans[element]-1;
-	  cout << element << " numtrans is " << numtrans[element] << endl;
+	  //cout << element << " numtrans is " << numtrans[element] << endl;
 	  if (numtrans[element] == 0){//numtrans becomes 0 for the first time  winning state
 	    statestack.push(element);
-	    cout << "State " << element << " is winning." << endl;
+	    //cout << "State " << element << " is winning." << endl;
 	    if (element == initial){
 	      return true;
 	    }
@@ -388,7 +400,7 @@ void Game::rawprint(int player){
 	cout << scomp[0] << ", " << scomp[1] << " --> "  << "Any action" << endl;
       }
       if (temp == 0){
-	cout << scomp[0] << ", " << scomp[1] << " --> " << "Non-winning state" << endl;
+	//cout << scomp[0] << ", " << scomp[1] << " --> " << "Non-winning state" << endl;
       }
     }
   }
