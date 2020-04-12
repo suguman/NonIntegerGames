@@ -77,7 +77,6 @@ Graph::Graph(string filename){
 
       switch(len){
       case 1:
-	//cout << splitparts[0] << endl;
 	if (!(splitparts[0]=="" or splitparts[0]=="\n" or splitparts[0]=="\t" or splitparts[0]=="\r")){
 	    initial = stoi(splitparts[0]);
 	}	
@@ -169,7 +168,6 @@ void Graph::printTrans(){
 
   unordered_map<int, vector<Transition*>> :: iterator p;
   unordered_map<int, vector<Transition*>>* temp = this->getTrans();
-  
   for (p = temp->begin(); p != temp->end(); p++){
     vector<Transition*> temptranslist= p->second;
     for (auto & element : temptranslist) {

@@ -251,13 +251,22 @@ void Game::printTrans(){
 
   unordered_map<string, vector<string>> :: iterator p;
   unordered_map<string, vector<string>>* temp = this->getTrans();
+
+  string printbuffer = "";
+  int counter = 1;
   
   for (p = temp->begin(); p != temp->end(); p++){
     vector<string> temptranslist= p->second;
     for (auto & element : temptranslist) {
-      cout << p->first << "-->" << element << endl;
+      printbuffer += p->first + "-->" + element +"\n";
+      counter +=1;
+      if (counter%1000 == 0){
+	cout << printbuffer;
+	printbuffer = "";
+      }
     }
   }
+  cout << printbuffer;
 }
 
 
@@ -380,14 +389,11 @@ void Game::rawprint(int player){
       temp  = dcomp.size(); 
       if (temp == 2){
 	printbuffer  += scomp[0] + ", " + scomp[1] + " --> " + dcomp[0] +  ", "  + dcomp[1] + "\n";
-	
-	//printbuffer  += to_string(scomp[0]) + ", " + to_string(scomp[1]) + " --> " + to_string(dcomp[0]) +  ", "  + to_string(dcomp[1]) + "\n";
 	//cout << scomp[0] << ", " << scomp[1] << " --> " << dcomp[0] << ", " << dcomp[1] << endl; 
       }
       if (temp  == 1){
 	
 	printbuffer  += scomp[0] + ", " + scomp[1] + " --> " + "Any action " + "\n";
-	//printbuffer  += to_string(scomp[0]) + ", " + to_string(scomp[1]) + " --> " + "Any action " + "\n";
 	//cout << scomp[0] << ", " << scomp[1] << " --> "  << "Any action" << endl;
       }
       if (temp == 0){

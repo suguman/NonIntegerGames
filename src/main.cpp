@@ -154,12 +154,10 @@ int  main(int argc, char** argv){
   Game* qg = new Game(gg, opt->df, opt->precision, opt->thresh, opt->relation);
   clock_t creategraph_e = clock();
   double creategraph = ((double) (creategraph_e- creategraph_s)) / CLOCKS_PER_SEC;
-  
+
   //qg->printAll();
   //qg->printRevTrans();
-
-  //cout << "Created game" << endl;
-
+  
   clock_t playgame_s = clock();
   bool playerwins = qg->reachabilitygame(opt->playerid);
   clock_t playgame_e = clock();
@@ -182,6 +180,7 @@ int  main(int argc, char** argv){
 
     }
   }
+  
 
   return 0;
 }
