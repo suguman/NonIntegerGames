@@ -107,22 +107,16 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   while(!statestack.empty()){
     string state = statestack.front();
     statestack.pop();
-    //cout << "State being explored is " << state << endl;
-    //cout << "State belongs to player " << statetoplayeraux[state] << endl;
     //Parts of current state
     vector<string> statetemp = split(state);
     int cur_state = stoi(statetemp[0]);
     int cur_comparator  = stoi(statetemp[1]);
-    //cout << "game state is " << cur_state << ", comp state is " << cur_comparator << endl;
-
     //Used to store all outgoing neighbours
     vector<string> deststatelist = {};
 
     vector<Transition*> translist = transF->at(cur_state);
 
     for(auto &trans : translist){
-      //trans->toString();
-
       //*****Begin: Make new state*****//
       // (a). Find the next state in the graph
       // (b). Find the next state in the comparator
@@ -148,7 +142,6 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
       
       // Make the destination state using (a) and (b)
       string new_state = stringify(next_src, next_comparator);
-      //cout << "The new state is " << new_state << endl;
       deststatelist.push_back(new_state);
       
       //*****End: Make new state*****//
@@ -173,10 +166,8 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 	else{
 	  winningaux[new_state] = "";
 	}
-	//cout << "Length of statestack before insertion is " << statestack.size() << endl;
 	statestack.push(new_state);
 	numstategame += 1;
-	//cout << "Length of statestack after insertion is " << statestack.size() << endl;
       }
     }
     transfuncaux[state] = deststatelist;
@@ -297,7 +288,6 @@ void Game::printAll(){
 
 void Game::modifywinning(string state, string gotostate){
   (this->winning)[state] = gotostate;
-  //cout << "From " << state << " go to " << gotostate << endl;
 }
 
 bool Game::reachabilitygame(int player){
@@ -325,7 +315,6 @@ bool Game::reachabilitygame(int player){
     
   while(!statestack.empty()){ 
     string state = statestack.front();
-    //cout << "Currently evaluating winning state  " << state << endl;
     statestack.pop();
     vector<string> revtranslist;
     try{
@@ -335,9 +324,7 @@ bool Game::reachabilitygame(int player){
       continue;
     }
     for(auto & element : revtranslist){
-      //cout << "Is state "<< element << " winning?" <<endl;
       int statebelongsto = statetoplayer->at(element);
-      //cout << "State belongs to " << statebelongsto << endl;
       if (statebelongsto == player){
 	//then element is a  winning state.	
 	//if element hasn't been visited before, then add to stack. 
@@ -346,7 +333,6 @@ bool Game::reachabilitygame(int player){
 	  statestack.push(element);
 	  numtrans[element] = 0;
 	  this->modifywinning(element, state);
-	  //cout << "State " << element << " is winning." << endl;
 	}
 	if (element == initial){
 	    //player has won, as it is visiting  initial state, controlled by the player
@@ -357,12 +343,9 @@ bool Game::reachabilitygame(int player){
 	// element will be winning only when numtans turns 0
 	// add element to stack only the first time numtrans turns 0
 	if (numtrans[element] != 0){
-	  //cout << element << " numtrans is " << numtrans[element] << endl;
 	  numtrans[element] = numtrans[element]-1;
-	  //cout << element << " numtrans is " << numtrans[element] << endl;
 	  if (numtrans[element] == 0){//numtrans becomes 0 for the first time  winning state
 	    statestack.push(element);
-	    //cout << "State " << element << " is winning." << endl;
 	    if (element == initial){
 	      return true;
 	    }
@@ -384,6 +367,8 @@ void Game::rawprint(int player){
   vector<string> scomp = {};
   vector<string>  dcomp = {};
   int temp;
+  string printbuffer = "";
+  int counter = 1;
   
   unordered_map<string, string> :: iterator p;
   for(p = wmap->begin(); p != wmap->end(); p++){
@@ -394,15 +379,25 @@ void Game::rawprint(int player){
       dcomp = split(deststate);
       temp  = dcomp.size(); 
       if (temp == 2){
-	cout << scomp[0] << ", " << scomp[1] << " --> " << dcomp[0] << ", " << dcomp[1] << endl; 
+	printbuffer  += scomp[0] + ", " + scomp[1] + " --> " + dcomp[0] +  ", "  + dcomp[1] + "\n";
+	
+	//printbuffer  += to_string(scomp[0]) + ", " + to_string(scomp[1]) + " --> " + to_string(dcomp[0]) +  ", "  + to_string(dcomp[1]) + "\n";
+	//cout << scomp[0] << ", " << scomp[1] << " --> " << dcomp[0] << ", " << dcomp[1] << endl; 
       }
       if (temp  == 1){
-	cout << scomp[0] << ", " << scomp[1] << " --> "  << "Any action" << endl;
+	
+	printbuffer  += scomp[0] + ", " + scomp[1] + " --> " + "Any action " + "\n";
+	//printbuffer  += to_string(scomp[0]) + ", " + to_string(scomp[1]) + " --> " + "Any action " + "\n";
+	//cout << scomp[0] << ", " << scomp[1] << " --> "  << "Any action" << endl;
       }
       if (temp == 0){
-	//cout << scomp[0] << ", " << scomp[1] << " --> " << "Non-winning state" << endl;
       }
     }
+    counter += 1;
+    if (counter%50000){
+      cout << printbuffer;
+      printbuffer = "";
+    }
   }
-  
+  cout << printbuffer;
 }
