@@ -20,7 +20,7 @@ class Location:
         self.col = c
 
     def __str__(self):
-        return str(self.row) +", "+str(self.col) 
+        return str(self.row) +", "+str(self.col)
         #return f'<{self.row},{self.col}>'
 
 
@@ -94,7 +94,7 @@ class State:
         return True
 
     def __hash__(self): #TODO: give a perfect hash function
-        return hash((self.human_locs[0], self.robot_locs[0], self.robot_turn))
+        return hash((self.human_locs[0], self.robot_locs[0], self.robot_turn, self.temporal_goals_visited[0], self.temporal_goals_visited[1]))
 
 
 #Map location to integer
@@ -157,8 +157,8 @@ def get_reward(loc, s):
     for i in range(len(temporal_goal_locs)):
         if s.temporal_goals_visited[i]:
             continue
-        if loc.row == l.row and loc.col == l.col:
-            r = r + 10*pos_reward
+        if loc.row == temporal_goal_locs[i].row and loc.col == temporal_goal_locs[i].col:
+            r = r + 2*pos_reward
             s.temporal_goals_visited[i] = True
     return r
 
@@ -168,7 +168,7 @@ def manhattan_dist(l1, l2):
 def gen_rewards(human_moves):
     r = []
     for m in human_moves:
-        r.append((int)(neg_reward / (1+manhattan_dist(m.robot_locs[0], m.human_locs[0]))))
+        r.append(2+(int)(neg_reward / (1+manhattan_dist(m.robot_locs[0], m.human_locs[0]))))
     return r
 
 def gen_human_moves(s): #TODO: generalize to n humans
