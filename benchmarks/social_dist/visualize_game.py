@@ -55,10 +55,12 @@ def draw_obs():
     ax.scatter(x, y, marker='s', color='grey')
 
 def draw_arrow(cell1,cell2,line_color):
+    ax = plt.gca()
     p1 = row_col2x_y(cell1)
     p2 = row_col2x_y(cell2)
     l = mlines.Line2D(p1,p2)
-    ax.add_line(l, color=line_color)
+    l.set_color(line_color)
+    ax.add_line(l)
 
 def load_strategy(filename):
     file = open(filename, 'r')
@@ -68,23 +70,26 @@ def load_strategy(filename):
 
     for l in lines:
         s = l.split("-->")
-        if s != 2:
+        if len(s) != 2:
             #skip non-strategy lines
             continue
         else:
-            s1 = s[0]
-            s2 = s[1]
-            tmp = s1.split(",")
+            str1 = s[0]
+            str2 = s[1]
+            tmp = str1.split(",")
             state1 = tmp[0]
             aut1=tmp[1]
             state2=state1
             aut2=aut1
-            if s2 != " Any action":
-                tmp = s2.split(",")
+            if str2 != " Any action \n":
+                tmp = str2.split(",")
+                if len(tmp) != 2:
+                    print("ERROR")
+                    print(tmp)
                 state2 = tmp[0]
                 aut2=tmp[1]
             
-            strategy[int(s1),int(aut1)] = (int(state2), int(aut2))
+            strategy[(int(state1),int(aut1))] = (int(state2), int(aut2))
     return strategy
 
 def load_int_to_state_mapping(filename):
@@ -95,11 +100,11 @@ def load_int_to_state_mapping(filename):
 
     for l in lines:
         s = l.split(",")
-        if s != 5:
+        if len(s) != 5:
             #skip non-strategy lines
             continue
         else:
-            int2locs[s[0]] = (s[1],s[2],s[3],s[4])
+            int2locs[int(s[0])] = (int(s[1]),int(s[2]),int(s[3]),int(s[4]))
     return int2locs
 
 def draw_move_human_loc():
@@ -107,14 +112,16 @@ def draw_move_human_loc():
 
 def draw_next_k_ply(strategy, int2locs, k):
     state = 1
-    aut = 1
-    robot_turn = False
+    aut = 0
+    robot_turn = True
     for i in range(k):
         next_state,next_aut = strategy[(state, aut)]
+        print(state)
+        print(int2locs[state])
         if robot_turn:
-            draw_arrow([int2locs[state](0), int2locs[state](1)], [int2locs[next_state](0), int2locs[next_state](1)], 'blue')
+            draw_arrow(Location(int2locs[state][0], int2locs[state][1]), Location(int2locs[next_state][0], int2locs[next_state][1]), 'blue')
         else:
-            draw_arrow([int2locs[state](2), int2locs[state](3)], [int2locs[next_state](2), int2locs[next_state](3)], 'red')
+            draw_arrow(Location(int2locs[state][2], int2locs[state][3]), Location(int2locs[next_state][2], int2locs[next_state][3]), 'red')
         robot_turn = not robot_turn
         state = next_state
         aut = next_aut

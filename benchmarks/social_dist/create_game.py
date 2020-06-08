@@ -212,8 +212,10 @@ initial_state = State([human_loc], [robot_loc], False)
 states = build_game(initial_state)
 
 state_map = {}
+int_2_state = []
 for i in range(len(states)):
     state_map[s2i(states[i])] = i
+    int_2_state.append(states[i])
 
 print("# states")
 print_states(states, state_map)
@@ -222,5 +224,8 @@ print(state_map[s2i(initial_state)])
 print("# transitions")
 print_transitions(states, state_map)
 
-#print(clineinputs)
-#print(num_rows, num_cols, pos_reward, neg_reward)
+file = open("int2locationmap.txt", "w")
+#We need this extra comma
+file.write("Format, state to location mapping given by: state_int, robot_row, robot_col, human_row, human_col")
+for i in range(len(states)):
+    file.write("{}, {}, {}, {}, {}\n".format(i,states[i].robot_locs[0].row, states[i].robot_locs[0].col, states[i].human_locs[0].row, states[i].human_locs[0].col))
