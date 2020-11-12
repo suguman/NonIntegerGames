@@ -19,15 +19,17 @@ Graph::Graph(){
   this->maxWt = 0;
   this->stateToPlayer = {};
   this->transFunc = {};
+  this->reach_objective = {};
 }
 
 
-Graph::Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap){
+Graph::Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap, vector<int>* reach_states){
   this->numState = num;
   this->initState = initial;
   this->maxWt = wt;
   this->stateToPlayer = *stateToP;
-  this->transFunc = *transMap;  
+  this->transFunc = *transMap;
+  this-> reach_objective = *reach_states;
 }
 
 
@@ -38,7 +40,7 @@ Graph::Graph(string filename){
   int maxweight = 0;
   unordered_map<int, int> stateToP = {};
   unordered_map<int, vector<Transition*>> transMap = {};
-  
+  vector <int> reach_states;;
 
   ifstream inFile;
   inFile.open(filename);
@@ -56,20 +58,24 @@ Graph::Graph(string filename){
   int partition;
   
   while(!inFile.eof()){
+
+    bool reachability = false;
     //output
     getline(inFile, output);
  
     trim(output);
+ 
     if (output[0] == '#'){
-	//IGNORE COMMENT
-      }
+      //IGNORE COMMENT
+    }
     else{
-      
       //Split the sequence at the whitespace
       // If split-sequence has
       // (a). single element -- iniital state
       // (b). two elements -- state and player affiliation
-      // (c). three elements -- transition
+      // (c). three elements
+      //    (i). If last is R, then (state and player) and state is a reachability objective
+      //    (ii) If last is not R, transition
 
       vector<string> splitparts;
       split(splitparts, output, [](char c){return c == ' ';});
@@ -93,16 +99,30 @@ Graph::Graph(string filename){
 	break;
 	
       case 3:
-	src = stoi(splitparts[0]);	
-	dest = stoi(splitparts[1]);
-        wt = stoi(splitparts[2]);
-	//cout << src << " " << dest << " " << wt << endl;
-        Transition* tempTrans = new Transition(src, dest, wt);
-	//tempTrans->toString();
-        transMap[src].push_back(tempTrans);
-	if (abs(wt)> maxweight){
-	  maxweight = wt;
+	if (splitparts[2]=="R"){
+	  // Register the state
+	  src = stoi(splitparts[0]);
+	  partition = stoi(splitparts[1]);
+	  //Set up the state-partition 
+	  stateToP.insert({src, partition});
+	  //Set up the transition relation
+	  transMap.insert({src, {}});
+	  stateNum +=1;
+	  //Register src as a reachability objective
+	  reach_states.push_back(src);
+	}
+	else{	
+	  src = stoi(splitparts[0]);	
+	  dest = stoi(splitparts[1]);
+	  wt = stoi(splitparts[2]);
+	  //cout << src << " " << dest << " " << wt << endl;
+	  Transition* tempTrans = new Transition(src, dest, wt);
+	  //tempTrans->toString();
+	  transMap[src].push_back(tempTrans);
+	  if (abs(wt)> maxweight){
+	    maxweight = wt;
 	  }
+	}
 	break;	
       }
     }
@@ -114,7 +134,8 @@ Graph::Graph(string filename){
   this->initState = initial;
   this->maxWt = maxweight;
   this->stateToPlayer = stateToP;
-  this->transFunc = transMap;  
+  this->transFunc = transMap;
+  this->reach_objective = reach_states;
 }
 
 Graph::~Graph(){
@@ -142,6 +163,10 @@ unordered_map<int, vector<Transition*>>* Graph::getTrans(){
 
 int Graph::getTransNum(){
   //TODO
+}
+
+vector<int>* Graph::getReachability(){
+  return &(this->reach_objective);
 }
 
 void Graph::printInitial(){
@@ -176,9 +201,25 @@ void Graph::printTrans(){
   }
 }
 
+void Graph::printReachability(){
+  
+  vector<int>* temp = this->getReachability();
+
+  int numreach = temp->size();
+  
+  if (numreach == 0){
+      return;
+    }
+  cout << "Reachability objectives:";
+  for(int i=0; i< numreach; i++){
+    cout << " " << temp->at(i);
+  }
+  cout << endl;
+}
 void Graph::printAll(){
   this->printInitial();
   this->printStoPlayer();
   this->printTrans();
   this->printMaxWt();
+  this->printReachability();
 }

@@ -22,7 +22,7 @@ class Game{
   virtual ~Game();
 
   //playing game
-  bool reachabilitygame(int player);
+  bool reachabilitygame(int player, bool early_termination);
   
   //Modify winning
   void modifywinning(string state, string gotostate);

@@ -3,7 +3,7 @@
 // Author      : Suguman Bansal
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Class for Graph
+// Description : Class for Games
 //============================================================================
 
 #include "common.h"
@@ -55,6 +55,8 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   
   unordered_map<int, vector<Transition*>>* transF = gg->getTrans();
   unordered_map<int, int>* statePlayerID = gg->getStateToPlayer();
+  vector<int>* reachability = gg->getReachability();
+    
   unordered_map<string, int> statetoplayeraux = {};
   unordered_map<string, vector<string>> transfuncaux = {};
   unordered_map<string, vector<string>> reversefuncaux = {};
@@ -156,16 +158,44 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
       catch(const std::out_of_range){
 	isstate[new_state] = true;
 	statetoplayeraux[new_state] = statePlayerID->at(next_src);
-	
-	if (relation == "geq" and next_comparator == upperbound){
-	  winningaux[new_state] = "W";
-	}
-	else if (relation == "leq" and next_comparator == lowerbound){
-	  winningaux[new_state] = "W";
+
+	//****** Begin: make it a winning state **********//
+
+	if (reachability->size() == 0){
+	  if (relation == "geq" and next_comparator == upperbound){
+	    winningaux[new_state] = "W";
+	  }
+	  else if (relation == "leq" and next_comparator == lowerbound){
+	    winningaux[new_state] = "W";
+	  }
+	  else{
+	    winningaux[new_state] = "";
+	  }
 	}
 	else{
-	  winningaux[new_state] = "";
+	  //if (next_src in reachability)
+	  //same conditions as above
+	  //else, state is not a winning state
+	  vector<int>::iterator it;
+	  it = find(reachability->begin(), reachability->end(), next_src);
+	  if (it!=reachability->end()){
+	      //new_src is a reachability objective
+	      if (relation == "geq" and next_comparator == upperbound){
+		winningaux[new_state] = "W";
+	      }
+	      else if (relation == "leq" and next_comparator == lowerbound){
+		winningaux[new_state] = "W";
+	      }
+	      else{
+		winningaux[new_state] = "";
+	      }
+	    }
+	  else{
+	    winningaux[new_state] = "";
+	  }
 	}
+	//****** End: make it a winning state **********//
+	
 	statestack.push(new_state);
 	numstategame += 1;
       }
@@ -299,7 +329,7 @@ void Game::modifywinning(string state, string gotostate){
   (this->winning)[state] = gotostate;
 }
 
-bool Game::reachabilitygame(int player){
+bool Game::reachabilitygame(int player, bool early_termination){
   
   unordered_map<string, vector<string>>* reverse_map = this->getRevTrans();
   unordered_map<string, vector<string>>* map = this->getTrans();
@@ -307,6 +337,9 @@ bool Game::reachabilitygame(int player){
   unordered_map<string, string>* winning = this->getWinning();
   string initial = this->getInitial();
 
+  // Initially, we assume that the player doesn't win
+  bool playerwins = false;
+  
   //1. Count the number of outgoing transitions from each state
   //2. Insert the winning states into the stackstack
   queue<string> statestack;
@@ -335,8 +368,8 @@ bool Game::reachabilitygame(int player){
     for(auto & element : revtranslist){
       int statebelongsto = statetoplayer->at(element);
       if (statebelongsto == player){
-	//then element is a  winning state.	
-	//if element hasn't been visited before, then add to stack. 
+	// then element is a  winning state.	
+	// if element hasn't been visited before, then add to stack. 
 	// element hasn't been visited before, its numtrans != 0
 	if (numtrans[element] != 0){
 	  statestack.push(element);
@@ -344,8 +377,11 @@ bool Game::reachabilitygame(int player){
 	  this->modifywinning(element, state);
 	}
 	if (element == initial){
-	    //player has won, as it is visiting  initial state, controlled by the player
-	    return true;
+	  //player has won, as it is visiting  initial state, controlled by the player
+	  playerwins = true;
+	  if (early_termination){
+	    return playerwins;
+	  }
 	}
       }
       else{//statebelongs to environment
@@ -356,14 +392,17 @@ bool Game::reachabilitygame(int player){
 	  if (numtrans[element] == 0){//numtrans becomes 0 for the first time  winning state
 	    statestack.push(element);
 	    if (element == initial){
-	      return true;
+	      playerwins = true;
+	      if (early_termination){
+		return playerwins;
+	      }
 	    }
 	  }
 	}
       }
-    }
-  }
-  return false;
+    }/*for ends*/
+  }/* while ends*/
+  return playerwins;
 }
 
 void Game::rawprint(int player){

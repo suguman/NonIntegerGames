@@ -13,7 +13,9 @@ static struct opt_t
   string relation = "geq";
   bool synthesis = false;
   int playerid = 0;
-
+  int early_termination = false;
+  bool print_all_winning = false;
+  
 }* opt;
 
 
@@ -39,6 +41,8 @@ void print_usage(){
   cout << " -syn" << "                   evaluate a winning strategy, if exists" << endl;
   cout << " -id " << " <int>             player id. can be 0 or 1. Default is 0." << endl;
   cout << " -f  " << " <filename>        filename specifying the game graph" << endl;
+  cout << " -et " << "                   early termination if initial state is winning. Default is False" << endl;
+  cout << " -ws " << "                   prints all winning states. Disables early termination" << endl;;
 }
 
 
@@ -125,6 +129,18 @@ void parse_opt(int argc, char** argv){
 	exit(-1);
       }
     }
+    if ( s =="-et"){
+      opt->early_termination = true;
+      if (opt->print_all_winning){
+	opt->early_termination = false;
+      }
+      continue;
+    }
+    if (s == "-ws"){
+      opt->print_all_winning = true;
+      opt->early_termination = false;
+      continue;
+    }
     else{
       cout << "Error in input options" << endl;
       print_usage();
@@ -147,7 +163,7 @@ int  main(int argc, char** argv){
 
   Graph* gg = new Graph(opt->filename);
   //gg->printAll();
-
+ 
   //create and solve reachability game
 
   clock_t creategraph_s = clock();
@@ -157,9 +173,9 @@ int  main(int argc, char** argv){
 
   //qg->printAll();
   //qg->printRevTrans();
-  
+
   clock_t playgame_s = clock();
-  bool playerwins = qg->reachabilitygame(opt->playerid);
+  bool playerwins = qg->reachabilitygame(opt->playerid, opt->early_termination);
   clock_t playgame_e = clock();
   double playgame = ((double) (playgame_e- playgame_s)) / CLOCKS_PER_SEC;
 
@@ -180,7 +196,10 @@ int  main(int argc, char** argv){
 
     }
   }
-  
+
+  if (opt->print_all_winning){
+    qg->printWinning();
+  }
 
   return 0;
 }
