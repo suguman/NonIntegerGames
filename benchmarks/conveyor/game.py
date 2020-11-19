@@ -1,13 +1,14 @@
 
-from config_file import length, width, speed, insertion_frequency, initial_state_list, Location
+from config_file import length, width, speed, insertion_frequency, initial_state_list, Location, positive_reward, negative_reward, human_reward
 
+import copy
 
 
 class State:
     obj_locs = []
     human_turn = False
-    human_loc = Location(width-1,length/2)
-    robot_loc = Location(0,length/2)
+    human_loc = Location(int(length/2), width-1)
+    robot_loc = Location(1,0)
     neighbors = []
 
     def __init__(self):
@@ -31,6 +32,7 @@ class State:
             i = 1
         r = r + i * power
         return r
+
 
 #We allow repeats in the ELSE region (region 1) only
 def nChooseKHelper(l, n, remaining_k):
@@ -59,7 +61,7 @@ def getNChooseKChoices(n, k):
 def gen_states_for_new_spawns(state):
     objs_to_spawn = []
     for i in range(len(state.obj_locs)):
-        if state.obj_locs[i] == length-1:
+        if state.obj_locs[i].row == length-1:
             objs_to_spawn.append(i)
     
     spawns = getNChooseKChoices(width-1, len(objs_to_spawn))
@@ -67,15 +69,15 @@ def gen_states_for_new_spawns(state):
     neighbs = []
     for s in spawns:
         s_prime = State()
-        s_prime.obj_locs = state.obj_locs.copy()
+        s_prime.obj_locs = copy.deepcopy(state.obj_locs)
         count = 0
         for i in range(len(state.obj_locs)):
-            if state.obj_locs[i] == length-1:
-                s_prime.obj_locs[i] = s[count]
+            if state.obj_locs[i].row == length-1:
+                s_prime.obj_locs[i] = Location(0,s[count])
                 count += 1
         s_prime.human_turn = state.human_turn
-        s_prime.robot_loc = state.robot_loc
-        s_prime.human_loc = state.human_loc
+        s_prime.robot_loc = state.robot_loc#.copy()
+        s_prime.human_loc = state.human_loc#.copy()
         neighbs.append(s_prime)
 
     if len(neighbs) == 0:
@@ -93,20 +95,20 @@ def gen_state_for_new_human_loc(state, new_loc):
         for i in range(len(s.obj_locs)):
             if s.obj_locs[i] == new_loc:
                 s_prime = State()
-                s_prime.obj_locs = s.obj_locs.copy()
+                s_prime.obj_locs = copy.deepcopy(s.obj_locs)
                 s_prime.obj_locs[i] = Location(s.obj_locs[i].row, length-1)
                 s_prime.human_turn = not s.human_turn
-                s_prime.robot_loc = s.robot_loc
-                s_prime.human_loc = new_loc
+                s_prime.robot_loc = s.robot_loc#.copy()
+                s_prime.human_loc = new_loc#.copy()
                 neighbs.append(s_prime)
                 picked_object = True
 
         if not picked_object:
             s_prime = State()
-            s_prime.obj_locs = s.obj_locs.copy()
+            s_prime.obj_locs = copy.deepcopy(s.obj_locs)
             s_prime.human_turn = not s.human_turn
-            s_prime.robot_loc = s.robot_loc
-            s_prime.human_loc = new_loc
+            s_prime.robot_loc = s.robot_loc#.copy()
+            s_prime.human_loc = new_loc#.copy()
             neighbs.append(s_prime)
     return neighbs
 
@@ -114,30 +116,38 @@ def gen_state_for_new_robot_loc(state, new_loc):
     neighbs = []
     picked_object = False
 
-    new_obj_locs = state.obj_locs.copy()
+    new_obj_locs = copy.deepcopy(state.obj_locs)
     for i in range(len(state.obj_locs)):
-        if i.col < length-1:
-            new_obj_locs[i].col = i.col+1
+        if state.obj_locs[i].row < length-1:
+            new_obj_locs[i].row = state.obj_locs[i].row+1
 
     for i in range(len(state.obj_locs)):
         if state.obj_locs[i] == new_loc:
             s_prime = State()
-            s_prime.obj_locs = new_obj_locs.copy()
+            s_prime.obj_locs = copy.deepcopy(new_obj_locs)
             s_prime.obj_locs[i] = Location(state.obj_locs[i].row, length-1)
             s_prime.human_turn = not state.human_turn
-            s_prime.robot_loc = state.robot_loc
-            s_prime.human_loc = new_loc
+            s_prime.robot_loc = state.robot_loc#.copy()
+            s_prime.human_loc = new_loc#.copy()
             neighbs.append(s_prime)
             picked_object = True
 
     if not picked_object:
         s_prime = State()
-        s_prime.obj_locs = new_obj_locs.copy()
+        s_prime.obj_locs = copy.deepcopy(new_obj_locs)
         s_prime.human_turn = not state.human_turn
-        s_prime.robot_loc = new_loc
-        s_prime.human_loc = state.human_loc
+        s_prime.robot_loc = new_loc#.copy()
+        s_prime.human_loc = state.human_loc#.copy()
         neighbs.append(s_prime)
     return neighbs
+
+#We test to see if they human arm or the robot arm overlap
+#We model them as line segments extending from opposite sides of the conveyor belt
+def is_valid_loc(human_loc, robot_loc):
+    if human_loc.row == robot_loc.row:
+        if human_loc.col <= robot_loc.col:
+            return False
+    return True
 
 def get_state_neighbors(state):
     neighbs = []
@@ -146,32 +156,40 @@ def get_state_neighbors(state):
         hl = state.human_loc
         if hl.row > 0:
             new_loc = Location(hl.row-1, hl.col)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
+            if is_valid_loc(new_loc, state.robot_loc):
+                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
         if hl.col > 1: #The human never goes to the top slot
             new_loc = Location(hl.row, hl.col-1)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
-        if hl.row < width-1:
+            if is_valid_loc(new_loc, state.robot_loc):
+                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
+        if hl.row < length-1:
             new_loc = Location(hl.row+1, hl.col)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
-        if hl.col < length-1:
+            if is_valid_loc(new_loc, state.robot_loc):
+                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
+        if hl.col < width-1:
             new_loc = Location(hl.row, hl.col+1)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
+            if is_valid_loc(new_loc, state.robot_loc):
+                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
         state.neighbors = neighbs
         return neighbs
     else:
-        rl = state.human_loc
+        rl = state.robot_loc
         if rl.row > 0:
             new_loc = Location(rl.row-1, rl.col)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
+            if is_valid_loc(state.human_loc, new_loc):
+                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
         if rl.col > 0:
             new_loc = Location(rl.row, rl.col-1)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
-        if rl.row < width-1:
+            if is_valid_loc(state.human_loc, new_loc):
+                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
+        if rl.row < length-1:
             new_loc = Location(rl.row+1, rl.col)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
-        if rl.col < length-1:
+            if is_valid_loc(state.human_loc, new_loc):
+                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
+        if rl.col < width-1:
             new_loc = Location(rl.row, rl.col+1)
-            neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
+            if is_valid_loc(state.human_loc, new_loc):
+                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
         state.neighbors = neighbs
         return neighbs
 
@@ -205,7 +223,6 @@ def build_game(init_state):
     return all_states
 
 
-
 initial_state = State()
 for obj_loc in initial_state_list:
     initial_state.obj_locs.append(obj_loc)
@@ -220,13 +237,25 @@ for s in game_states:
     counter += 1
     i = 1
     if s.human_turn:
-        i = -1
+        i = 0
     print(str(counter)+" "+str(i))
 
 print("# transitions")
 for s in game_states:
-    i = 1
-    if s.human_turn:
-        i = -1
+    # i = 1
+    # if s.human_turn:
+    #     i = -1
+
     for n in s.neighbors:
-        print(str(state_to_int_map[s.to_int()])+" "+str(state_to_int_map[n.to_int()])+" "+str(i))
+        reward = 0
+        #We compare current block locs to next hand locs because the blocks update when hands move
+        for l in s.obj_locs:
+            if n.robot_loc == l:
+                reward = reward + positive_reward
+            elif n.human_loc == l:
+                reward = reward + human_reward
+            elif l.row >= length-2:
+                reward = reward + negative_reward #we add because it's negative
+            else:
+                pass
+        print(str(state_to_int_map[s.to_int()])+" "+str(state_to_int_map[n.to_int()])+" "+str(reward))
