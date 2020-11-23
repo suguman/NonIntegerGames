@@ -20,7 +20,7 @@ class Location:
         self.col = c
 
     def __str__(self):
-        return f'<{self.row},{self.col}>'
+        return "<{},{}>".format(self.row,self.col)
 
     def to_int(self):
         return self.row * width + self.col
