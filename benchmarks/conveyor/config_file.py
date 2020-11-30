@@ -2,7 +2,12 @@ width = 3
 length = 5 # We use the last row to denote objects the human can place next turn
 #Really we should only use one location for this
 
-speed = 1
+speed = 1 #We always assume this is 1
+
+robot_speed = 2
+human_speed = 2
+
+
 
 insertion_frequency = 1.0/2
 

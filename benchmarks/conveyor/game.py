@@ -1,5 +1,5 @@
 
-from config_file import length, width, speed, insertion_frequency, initial_state_list, Location, positive_reward, negative_reward, human_reward
+from config_file import length, width, speed, insertion_frequency, initial_state_list, Location, positive_reward, negative_reward, human_reward, human_speed, robot_speed
 
 import copy
 
@@ -149,47 +149,53 @@ def is_valid_loc(human_loc, robot_loc):
             return False
     return True
 
-def get_state_neighbors(state):
-    neighbs = []
-
+def get_potential_neighbor_locs(state):
+    pot_locs = []
     if state.human_turn:
         hl = state.human_loc
-        if hl.row > 0:
-            new_loc = Location(hl.row-1, hl.col)
-            if is_valid_loc(new_loc, state.robot_loc):
-                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
-        if hl.col > 1: #The human never goes to the top slot
-            new_loc = Location(hl.row, hl.col-1)
-            if is_valid_loc(new_loc, state.robot_loc):
-                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
-        if hl.row < length-1:
-            new_loc = Location(hl.row+1, hl.col)
-            if is_valid_loc(new_loc, state.robot_loc):
-                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
-        if hl.col < width-1:
-            new_loc = Location(hl.row, hl.col+1)
-            if is_valid_loc(new_loc, state.robot_loc):
-                neighbs = neighbs + gen_state_for_new_human_loc(state, new_loc)
+        for i in range(1,human_speed+1):#go from 1 to human_speed inclusive
+            if hl.row - i > 0: #The human never goes to the top row
+                pot_locs.append(Location(hl.row-i, hl.col))
+            if hl.col-i > 0: #The human never goes to the left column
+                pot_locs.append(Location(hl.row, hl.col-i))
+            if hl.row + i < length-1:
+                pot_locs.append(Location(hl.row+i, hl.col))
+            if hl.col+i < width-1:
+                pot_locs.append(Location(hl.row, hl.col+i))
+    else:
+        rl = state.robot_loc
+        if rl.col == 0: #allow robot to go anywhere on left column in one move
+            for i in range(length):
+                pot_locs.append(Location(i,0))
+            pot_locs.append(Location(rl.row, 1))
+        else: #move as normal
+            for i in range(1,robot_speed+1):#go from 1 to robot speed inclusive
+                if rl.row-i >= 0:
+                    pot_locs.append(Location(rl.row-i, rl.col))
+                if rl.col-i >= 0:
+                    pot_locs.append(Location(rl.row, rl.col-i))
+                if rl.row+i < length:
+                    pot_locs.append(Location(rl.row+i, rl.col))
+                if rl.col+i < width:
+                    pot_locs.append(Location(rl.row, rl.col+i))
+    return pot_locs
+
+def get_state_neighbors(state):
+    neighbs = []
+    if state.human_turn:
+        pot_locs = get_potential_neighbor_locs(state)
+
+        for l in pot_locs:
+            if is_valid_loc(l, state.robot_loc):
+                neighbs = neighbs + gen_state_for_new_human_loc(state, l)
         state.neighbors = neighbs
         return neighbs
     else:
-        rl = state.robot_loc
-        if rl.row > 0:
-            new_loc = Location(rl.row-1, rl.col)
-            if is_valid_loc(state.human_loc, new_loc):
-                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
-        if rl.col > 0:
-            new_loc = Location(rl.row, rl.col-1)
-            if is_valid_loc(state.human_loc, new_loc):
-                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
-        if rl.row < length-1:
-            new_loc = Location(rl.row+1, rl.col)
-            if is_valid_loc(state.human_loc, new_loc):
-                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
-        if rl.col < width-1:
-            new_loc = Location(rl.row, rl.col+1)
-            if is_valid_loc(state.human_loc, new_loc):
-                neighbs = neighbs + gen_state_for_new_robot_loc(state, new_loc)
+        pot_locs = get_potential_neighbor_locs(state)
+
+        for l in pot_locs:
+            if is_valid_loc(state.human_loc, l):
+                neighbs = neighbs + gen_state_for_new_robot_loc(state, l)
         state.neighbors = neighbs
         return neighbs
 
