@@ -5,13 +5,13 @@ length = 5 # We use the last row to denote objects the human can place next turn
 speed = 1 #We always assume this is 1
 
 robot_speed = 2
-human_speed = 2
+human_speed = 1
 
 
 
-insertion_frequency = 1.0/2
+insertion_frequency = 1.0/2 #currently unused. We just reinsert whenever a block is removed.
 
-positive_reward = 100 #when the robot grasps an object
+positive_reward = 1 #when the robot grasps an object
 negative_reward = -1 #When an object falls off the end
 human_reward = 0 #Reward when a human grabs an object (currently not optional for the human)
 

@@ -209,6 +209,7 @@ def build_game(init_state):
     curr_frontier = []
     all_states = []
 
+    all_states.append(init_state)
     curr_frontier.append(init_state)
 
     while(len(curr_frontier) > 0):
