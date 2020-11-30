@@ -1,0 +1,14 @@
+Filename          : ../benchmarks/grid_world/game.txt
+Discount factor   : 1+2^-2
+Precision         : 2^-1
+Treshold          : 0
+Relation          : geq
+Player id         : 1
+Comparator range  : -480 to 484
+ 
+Input quant. game : 20572 states 
+Reachability game : 12046 states 
+Game creation     : 0.207101 seconds
+Game play         : 0.010337 seconds
+ 
+Player 1 does not win
