@@ -163,13 +163,15 @@ int  main(int argc, char** argv){
 
   Graph* gg = new Graph(opt->filename);
   //gg->printAll();
- 
+  //gg->printStoPlayer();
+  
   //create and solve reachability game
 
   clock_t creategraph_s = clock();
   Game* qg = new Game(gg, opt->df, opt->precision, opt->thresh, opt->relation);
   clock_t creategraph_e = clock();
   double creategraph = ((double) (creategraph_e- creategraph_s)) / CLOCKS_PER_SEC;
+  cout << "Game creation     : " <<  creategraph << " seconds" << endl;
 
   //qg->printAll();
   //qg->printRevTrans();

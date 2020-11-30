@@ -81,6 +81,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   int lowerbound = -1*maxWt*res_temp;
   int upperbound = 1*maxWt*res_temp + int(pow(2,df));
 
+  
   cout << "Comparator range  : " << lowerbound << " to " << upperbound << endl;
   
   //******* End: Get bounds for comparator automata*********//
@@ -89,6 +90,8 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   string init = stringify(gg->getInitial(), 0);
   this->initial = init; 
 
+  //cout << init << endl;
+  
   // ******* End : initial state of game ********//
 
   
@@ -105,10 +108,12 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   isstate[init] = true;
   statetoplayeraux[init] = statePlayerID->at(gg->getInitial());
   winningaux[init] = "";
-
+  reversefuncaux[init] = {};
+  
   while(!statestack.empty()){
     string state = statestack.front();
     statestack.pop();
+    //cout << state << endl;
     //Parts of current state
     vector<string> statetemp = split(state);
     int cur_state = stoi(statetemp[0]);
@@ -144,7 +149,6 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
       
       // Make the destination state using (a) and (b)
       string new_state = stringify(next_src, next_comparator);
-      deststatelist.push_back(new_state);
       
       //*****End: Make new state*****//
       
@@ -158,7 +162,8 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
       catch(const std::out_of_range){
 	isstate[new_state] = true;
 	statetoplayeraux[new_state] = statePlayerID->at(next_src);
-
+	reversefuncaux[new_state] = {};
+	
 	//****** Begin: make it a winning state **********//
 
 	if (reachability->size() == 0){
@@ -199,12 +204,17 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 	statestack.push(new_state);
 	numstategame += 1;
       }
+      deststatelist.push_back(new_state);
+      reversefuncaux[new_state].push_back(state);	
     }
     transfuncaux[state] = deststatelist;
   }
   this->stateToPlayer = statetoplayeraux;
   this->transFunc = transfuncaux;
-  
+
+  //cout << "Completed while" << endl;
+
+  /*
   //Make reverse transitions
   unordered_map<string, vector<string>> :: iterator p;
   
@@ -220,6 +230,8 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
       }
     }
   }
+  */
+  
   this->reverseFunc = reversefuncaux;
   this->winning = winningaux;
   this->allstates = numstategame;

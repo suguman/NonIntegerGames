@@ -240,6 +240,11 @@ for s in game_states:
         i = 0
     print(str(counter)+" "+str(i))
 
+### TO CHECK WITH ANDREW 
+print("# initial state")
+print(state_to_int_map[initial_state.to_int()])
+#########################
+
 print("# transitions")
 for s in game_states:
     # i = 1
