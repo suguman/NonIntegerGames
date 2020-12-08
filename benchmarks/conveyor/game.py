@@ -11,6 +11,8 @@ class State:
     robot_loc = Location(1,0)
     neighbors = []
 
+    is_reachability_goal = False
+
     def __init__(self):
         self.obj_locs=[]
         self.human_turn = False
@@ -131,6 +133,7 @@ def gen_state_for_new_robot_loc(state, new_loc):
             s_prime.human_loc = new_loc#.copy()
             neighbs.append(s_prime)
             picked_object = True
+            s_prime.is_reachability_goal = True #TODO: is this what we want for reachability goals?
 
     if not picked_object:
         s_prime = State()
@@ -245,12 +248,13 @@ for s in game_states:
     i = 1
     if s.human_turn:
         i = 0
-    print(str(counter)+" "+str(i))
+    if s.is_reachability_goal:
+        print(str(counter)+" "+str(i)+ " r")
+    else:
+        print(str(counter)+" "+str(i))
 
-### TO CHECK WITH ANDREW 
 print("# initial state")
 print(state_to_int_map[initial_state.to_int()])
-#########################
 
 print("# transitions")
 for s in game_states:
