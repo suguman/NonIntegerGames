@@ -16,6 +16,8 @@ class State:
     neighbors = []
     rewards = []
 
+    is_reachability_goal = False
+
     def __init__(self, human_locs, robot_locs, robot_turn):
         self.human_locs = human_locs
         self.robot_locs = robot_locs
