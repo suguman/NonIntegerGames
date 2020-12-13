@@ -20,16 +20,18 @@ Graph::Graph(){
   this->stateToPlayer = {};
   this->transFunc = {};
   this->reach_objective = {};
+  this->reach = 0;
 }
 
 
-Graph::Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap, vector<int>* reach_states){
+Graph::Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap, vector<int>* reach_states, int rflag){
   this->numState = num;
   this->initState = initial;
   this->maxWt = wt;
   this->stateToPlayer = *stateToP;
   this->transFunc = *transMap;
   this-> reach_objective = *reach_states;
+  this->reach = rflag;
 }
 
 
@@ -41,7 +43,8 @@ Graph::Graph(string filename){
   unordered_map<int, int> stateToP = {};
   unordered_map<int, vector<Transition*>> transMap = {};
   vector <int> reach_states;;
-
+  int rflag = 0;
+  
   ifstream inFile;
   inFile.open(filename);
   if (!inFile){
@@ -110,6 +113,7 @@ Graph::Graph(string filename){
 	  stateNum +=1;
 	  //Register src as a reachability objective
 	  reach_states.push_back(src);
+	  rflag += 1;
 	}
 	else{	
 	  src = stoi(splitparts[0]);	
@@ -136,6 +140,7 @@ Graph::Graph(string filename){
   this->stateToPlayer = stateToP;
   this->transFunc = transMap;
   this->reach_objective = reach_states;
+  this->reach = rflag;
 }
 
 Graph::~Graph(){
@@ -167,6 +172,10 @@ int Graph::getTransNum(){
 
 vector<int>* Graph::getReachability(){
   return &(this->reach_objective);
+}
+
+int Graph::getAreReach(){
+  return this->reach;
 }
 
 void Graph::printInitial(){
