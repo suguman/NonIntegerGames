@@ -117,6 +117,8 @@ def gen_state_for_new_robot_loc(state, new_loc):
     picked_object = False
 
     new_obj_locs = copy.deepcopy(state.obj_locs)
+
+    # Advance the objects on the belt
     for i in range(len(state.obj_locs)):
         if state.obj_locs[i].row < length-1:
             new_obj_locs[i].row = state.obj_locs[i].row+1
@@ -158,14 +160,14 @@ def get_potential_neighbor_locs(state):
                 pot_locs.append(Location(hl.row-i, hl.col))
             if hl.col-i > 0: #The human never goes to the left column
                 pot_locs.append(Location(hl.row, hl.col-i))
-            if hl.row + i < length-1:
+            if hl.row + i < length:
                 pot_locs.append(Location(hl.row+i, hl.col))
-            if hl.col+i < width-1:
+            if hl.col+i < width:
                 pot_locs.append(Location(hl.row, hl.col+i))
     else:
         rl = state.robot_loc
         if rl.col == 0: #allow robot to go anywhere on left column in one move
-            for i in range(length):
+            for i in range(length-1):
                 pot_locs.append(Location(i,0))
             pot_locs.append(Location(rl.row, 1))
         else: #move as normal
@@ -174,7 +176,7 @@ def get_potential_neighbor_locs(state):
                     pot_locs.append(Location(rl.row-i, rl.col))
                 if rl.col-i >= 0:
                     pot_locs.append(Location(rl.row, rl.col-i))
-                if rl.row+i < length:
+                if rl.row+i < length-1:
                     pot_locs.append(Location(rl.row+i, rl.col))
                 if rl.col+i < width:
                     pot_locs.append(Location(rl.row, rl.col+i))

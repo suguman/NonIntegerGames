@@ -11,7 +11,7 @@ human_speed = 1
 
 insertion_frequency = 1.0/2 #currently unused. We just reinsert whenever a block is removed.
 
-positive_reward = 1 #when the robot grasps an object
+positive_reward = 10 #when the robot grasps an object
 negative_reward = -1 #When an object falls off the end
 human_reward = 0 #Reward when a human grabs an object (currently not optional for the human)
 

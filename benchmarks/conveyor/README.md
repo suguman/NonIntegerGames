@@ -21,3 +21,8 @@ Length is the number of rows. Note that the last row is used to model objects th
 Insertion frequency is unused (currently blocks are replaced the turn after they are removed to keep the number of blocks constant)
 
 Speed is the distance objects move each time step. (currently not used)
+
+
+Time is relative to the speed of the belt (the objects move down one cell per unit time)
+Robot speed is the number of cells the robot moves in one step
+Human speed is the number of cells the human moves in one step
