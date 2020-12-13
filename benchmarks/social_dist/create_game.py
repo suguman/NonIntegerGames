@@ -27,6 +27,8 @@ class State:
     neighbors = []
     rewards = []
 
+    is_reachability_goal = False
+
     def __init__(self, human_locs, robot_locs, robot_turn):
         self.human_locs = human_locs
         self.robot_locs = robot_locs
@@ -102,9 +104,15 @@ def print_states(states, state_map):
     for s in states:
         # print(s)
         if s.robot_turn:
-            print(str(state_map[s2i(s)]) + " 1")
+            if s.is_reachability_goal:
+                print(str(state_map[s2i(s)]) + " 1 r")
+            else:
+                print(str(state_map[s2i(s)]) + " 1")
         else:
-            print(str(state_map[s2i(s)]) + " 0")
+            if s.is_reachability_goal:
+                print(str(state_map[s2i(s)]) + " 0 r")
+            else:
+                print(str(state_map[s2i(s)]) + " 0")
 
 def print_transitions(states, state_map):
     for s in states:
@@ -168,6 +176,8 @@ def gen_moves(s):
                 newState = State(s.human_locs.copy(), [n], False)
                 moves.append(newState)
                 rewards.append(get_reward(n))
+                if(get_reward(n) > 0): #TODO: for now, we assume we only get positive rewards at the goals
+                    newState.is_reachability_goal = True
     s.neighbors = moves
     s.rewards = rewards
     return moves
