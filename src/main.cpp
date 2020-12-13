@@ -162,12 +162,12 @@ int  main(int argc, char** argv){
   //create game graph from file
 
   Graph* gg = new Graph(opt->filename);
-  gg->printAll();
+  //gg->printAll();
   //gg->printStoPlayer();
-  cout << gg->getAreReach() << endl;
+  //cout << gg->isReach() << endl;
+
   //create and solve reachability game
 
-  /*
   clock_t creategraph_s = clock();
   Game* qg = new Game(gg, opt->df, opt->precision, opt->thresh, opt->relation);
   clock_t creategraph_e = clock();
@@ -181,7 +181,7 @@ int  main(int argc, char** argv){
   bool playerwins = qg->reachabilitygame(opt->playerid, opt->early_termination);
   clock_t playgame_e = clock();
   double playgame = ((double) (playgame_e- playgame_s)) / CLOCKS_PER_SEC;
-
+  
   cout << " " << endl;
   cout << "Input quant. game : " << gg->getStateNum() << " states " << endl;
   cout << "Reachability game : " << qg->getallstates() << " states " << endl;
@@ -203,7 +203,7 @@ int  main(int argc, char** argv){
   if (opt->print_all_winning){
     qg->printWinning();
   }
-  */
+  
   return 0;
 }
 

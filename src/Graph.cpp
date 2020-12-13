@@ -20,11 +20,11 @@ Graph::Graph(){
   this->stateToPlayer = {};
   this->transFunc = {};
   this->reach_objective = {};
-  this->reach = 0;
+  this->reach = false;
 }
 
 
-Graph::Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap, vector<int>* reach_states, int rflag){
+Graph::Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap, unordered_map<int, bool>* reach_states, bool rflag){
   this->numState = num;
   this->initState = initial;
   this->maxWt = wt;
@@ -42,8 +42,8 @@ Graph::Graph(string filename){
   int maxweight = 0;
   unordered_map<int, int> stateToP = {};
   unordered_map<int, vector<Transition*>> transMap = {};
-  vector <int> reach_states;;
-  int rflag = 0;
+  unordered_map<int, bool> reach_states;;
+  bool rflag = false;
   
   ifstream inFile;
   inFile.open(filename);
@@ -99,6 +99,7 @@ Graph::Graph(string filename){
 	//Set up the transition relation
         transMap.insert({src, {}});
         stateNum +=1;
+	reach_states[src] = false;
 	break;
 	
       case 3:
@@ -112,8 +113,9 @@ Graph::Graph(string filename){
 	  transMap.insert({src, {}});
 	  stateNum +=1;
 	  //Register src as a reachability objective
-	  reach_states.push_back(src);
-	  rflag += 1;
+	  //reach_states.push_back(src);
+	  reach_states[src] = true;
+	  rflag = true;
 	}
 	else{	
 	  src = stoi(splitparts[0]);	
@@ -170,11 +172,11 @@ int Graph::getTransNum(){
   //TODO
 }
 
-vector<int>* Graph::getReachability(){
+unordered_map<int, bool>* Graph::getReachability(){
   return &(this->reach_objective);
 }
 
-int Graph::getAreReach(){
+bool Graph::isReach(){
   return this->reach;
 }
 
@@ -211,9 +213,17 @@ void Graph::printTrans(){
 }
 
 void Graph::printReachability(){
-  
-  vector<int>* temp = this->getReachability();
 
+  cout << "Reachability relation is " << endl;
+
+  unordered_map<int, bool> :: iterator p;
+  unordered_map<int, bool>* temp = this->getReachability();
+  //unordered_map<int, int>* temp = this->getReachability();
+  for (p = temp->begin(); p != temp->end(); p++){
+    cout << p->first << ", " << p->second << endl;
+  }
+
+  /*
   int numreach = temp->size();
   
   if (numreach == 0){
@@ -224,6 +234,8 @@ void Graph::printReachability(){
     cout << " " << temp->at(i);
   }
   cout << endl;
+  */
+  
 }
 void Graph::printAll(){
   this->printInitial();

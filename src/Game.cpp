@@ -55,7 +55,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
   
   unordered_map<int, vector<Transition*>>* transF = gg->getTrans();
   unordered_map<int, int>* statePlayerID = gg->getStateToPlayer();
-  vector<int>* reachability = gg->getReachability();
+  unordered_map<int, bool>* reachability = gg->getReachability();
     
   unordered_map<string, int> statetoplayeraux = {};
   unordered_map<string, vector<string>> transfuncaux = {};
@@ -166,7 +166,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 	
 	//****** Begin: make it a winning state **********//
 
-	if (reachability->size() == 0){
+	if (!gg->isReach()){
 	  if (relation == "geq" and next_comparator == upperbound){
 	    winningaux[new_state] = "W";
 	  }
@@ -181,9 +181,14 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 	  //if (next_src in reachability)
 	  //same conditions as above
 	  //else, state is not a winning state
-	  vector<int>::iterator it;
-	  it = find(reachability->begin(), reachability->end(), next_src);
-	  if (it!=reachability->end()){
+
+	  if (reachability->at(cur_state)){
+	    //cout << cur_state << endl;
+	    //cout << "Yo" << endl;
+	    reachability->at(next_src) = true;
+	  }
+
+	  if (reachability->at(next_src)){
 	      //new_src is a reachability objective
 	      if (relation == "geq" and next_comparator == upperbound){
 		winningaux[new_state] = "W";
@@ -198,6 +203,7 @@ Game::Game(Graph* gg, int df, int precision, int threshold, string relation){
 	  else{
 	    winningaux[new_state] = "";
 	  }
+	  
 	}
 	//****** End: make it a winning state **********//
 	

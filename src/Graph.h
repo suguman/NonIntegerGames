@@ -18,7 +18,7 @@ class Graph{
  public:
   Graph();
   Graph(string filename);
-  Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap, vector<int>* reach_states, int rfalg);
+  Graph(int num, int initial, int wt, unordered_map<int, int>* stateToP, unordered_map<int, vector< Transition*>>* transMap, unordered_map<int, bool>* reach_states, bool rfalg);
   virtual ~Graph();
 
   //Access functions
@@ -27,8 +27,8 @@ class Graph{
   int getWt();
   unordered_map<int, int>* getStateToPlayer();
   unordered_map<int, vector< Transition*>>* getTrans();
-  vector<int>* getReachability();
-  int getAreReach();
+  unordered_map<int, bool>* getReachability();
+  bool isReach();
   
   //Functionality  
   int getTransNum();
@@ -48,8 +48,8 @@ class Graph{
   int maxWt;
   unordered_map<int, int> stateToPlayer;
   unordered_map<int, vector<Transition*>> transFunc;
-  vector<int> reach_objective;
-  int reach;
+  unordered_map<int, bool> reach_objective;
+  bool reach;
 };
 
 
