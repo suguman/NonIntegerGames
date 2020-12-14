@@ -105,12 +105,12 @@ def print_states(states, state_map):
         # print(s)
         if s.robot_turn:
             if s.is_reachability_goal:
-                print(str(state_map[s2i(s)]) + " 1 r")
+                print(str(state_map[s2i(s)]) + " 1 R")
             else:
                 print(str(state_map[s2i(s)]) + " 1")
         else:
             if s.is_reachability_goal:
-                print(str(state_map[s2i(s)]) + " 0 r")
+                print(str(state_map[s2i(s)]) + " 0 R")
             else:
                 print(str(state_map[s2i(s)]) + " 0")
 

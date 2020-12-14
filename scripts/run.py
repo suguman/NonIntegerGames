@@ -1,13 +1,20 @@
 import os
 import sys
 
-benchmark = [(5,5), (5,10), (5,15), (6,6), (6,12), (6,18), (10,10), (10,15), (10,20), (10,30), (10,35)]
+gridsize = [(4,4), (6,6), (8,8), (10,10)]
+weights = [(5,-1), (10,-2), (10,-1), (18,-2)]
+gridsize = [(8,8)]
+weights = [(5,-1),(10,-2)]
 
-dflist = [4]
-for df in dflist:
-    for (i,j) in benchmark:
-        filename = "../benchmarks/"+str(i)+"_"+str(j)+".txt"
-        outputfilename = "../outputs/"+str(i)+"_"+str(j)+"_"+str(df)+".txt"
-        commandline = " ".join(["../src/./game", "-f", filename, "-df", str(df), "-id" , str(1), "-syn", ">", outputfilename])
-        print(commandline)
-        os.system(commandline)
+for (r,c) in gridsize:
+    for (p,n) in weights:
+        
+        filename = "../benchmarks/social_dist/"+"_".join([str(r),str(c),str(p),str(-1*n)])+".txt"
+        #command = " ".join(["python3 ../benchmarks/create_game.py", str(r), str(c), str(p), str(n), ">", filename])
+        #print(command)
+        #os.system(command)
+        for df in [2,3]:
+            outputfilename = "../outputs/social_dist/" +  "_".join([str(r),str(c),str(p),str(-1*n), str(df)])+".txt"
+            runprogram = " ".join(["timeout 2400 time", "../src/./game", "-df", str(df), "-id 1 -syn -f", filename, ">", outputfilename])
+            print(runprogram)
+            #os.system(runprogram)
