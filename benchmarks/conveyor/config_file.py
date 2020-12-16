@@ -34,4 +34,4 @@ class Location:
         return self.row == other.row and self.col == other.col
 
 
-initial_state_list = [Location(0,0), Location(0,3)]
+initial_state_list = [Location(1,0), Location(1,3)] #always start here

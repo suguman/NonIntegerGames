@@ -3,6 +3,7 @@ from config_file import length, width, speed, insertion_frequency, initial_state
 
 import copy
 
+import sys
 
 class State:
     obj_locs = []
@@ -155,6 +156,9 @@ def is_valid_loc(human_loc, robot_loc):
     return True
 
 def get_potential_neighbor_locs(state):
+    print(positive_reward)
+    print(length)
+
     pot_locs = []
     if state.human_turn:
         hl = state.human_loc
@@ -235,45 +239,64 @@ def build_game(init_state):
     return all_states
 
 
-initial_state = State()
-for obj_loc in initial_state_list:
-    initial_state.obj_locs.append(obj_loc)
-    initial_state.human_turn=True
+def main():
 
-game_states = build_game(initial_state)
-state_to_int_map = {}
-counter = 0
-print("# states")
-for s in game_states:
-    state_to_int_map[s.to_int()] = counter
-    counter += 1
-    i = 1
-    if s.human_turn:
-        i = 0
-    if s.is_reachability_goal:
-        print(str(counter)+" "+str(i)+ " r")
-    else:
-        print(str(counter)+" "+str(i))
+    if len(sys.argv) == 5:
+        global width 
+        width = int(sys.argv[1])
+        global length 
+        length = int(sys.argv[2])
+        global positive_reward 
+        positive_reward = int(sys.argv[3])
+        global negative_reward 
+        negative_reward = int(sys.argv[4])
+    elif len(sys.argv) > 1:
+        print("Call: python3 game.py width length pos_reward neg_reward")
+        print("or edit config_file.py and call: python3 game.py")
 
-print("# initial state")
-print(state_to_int_map[initial_state.to_int()])
 
-print("# transitions")
-for s in game_states:
-    # i = 1
-    # if s.human_turn:
-    #     i = -1
+    initial_state = State()
+    for obj_loc in initial_state_list:
+        initial_state.obj_locs.append(obj_loc)
+        initial_state.human_turn=True
 
-    for n in s.neighbors:
-        reward = 0
-        #We compare current block locs to next hand locs because the blocks update when hands move
-        for l in s.obj_locs:
-            if n.robot_loc == l:
-                reward = reward + positive_reward
-            elif n.human_loc == l:
-                reward = reward + human_reward
-            elif l.row >= length-2:
-                reward = reward + negative_reward #we add because it's negative
-            else:
-                pass
-        print(str(state_to_int_map[s.to_int()])+" "+str(state_to_int_map[n.to_int()])+" "+str(reward))
+    game_states = build_game(initial_state)
+    state_to_int_map = {}
+    counter = 0
+    print("# states")
+    for s in game_states:
+        state_to_int_map[s.to_int()] = counter
+        counter += 1
+        i = 1
+        if s.human_turn:
+            i = 0
+        if s.is_reachability_goal:
+            print(str(counter)+" "+str(i)+ " r")
+        else:
+            print(str(counter)+" "+str(i))
+
+    print("# initial state")
+    print(state_to_int_map[initial_state.to_int()])
+
+    print("# transitions")
+    for s in game_states:
+        # i = 1
+        # if s.human_turn:
+        #     i = -1
+
+        for n in s.neighbors:
+            reward = 0
+            #We compare current block locs to next hand locs because the blocks update when hands move
+            for l in s.obj_locs:
+                if n.robot_loc == l:
+                    reward = reward + positive_reward
+                elif n.human_loc == l:
+                    reward = reward + human_reward
+                elif l.row >= length-2:
+                    reward = reward + negative_reward #we add because it's negative
+                else:
+                    pass
+            print(str(state_to_int_map[s.to_int()])+" "+str(state_to_int_map[n.to_int()])+" "+str(reward))
+
+if __name__ == "__main__":
+    main()
