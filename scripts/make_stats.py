@@ -119,13 +119,18 @@ for e in entries:
         last_sz = sz
 
     
-
-    if e.pos_reward+e.neg_reward != last_rew_s:
-        print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & "+str(e.creation_time)+" & "+str(e.solution_time)+" & "+str(e.creation_time+e.solution_time)+"    \\\\ \\cline{3-6}")
-        last_rew_s = e.pos_reward+e.neg_reward
+    if e.creation_time < 0:
+        if e.pos_reward+e.neg_reward != last_rew_s:
+            print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & --- & --- & --- "+"    \\\\ \\cline{3-6}")
+            last_rew_s = e.pos_reward+e.neg_reward
+        else:
+            print("                   &                     & "+str(e.discount_factor)+" & --- & --- & --- "+"    \\\\ \\hline")
     else:
-        print("                   &                     & "+str(e.discount_factor)+" & "+str(e.creation_time)+" & "+str(e.solution_time)+" & "+str(e.creation_time+e.solution_time)+"    \\\\ \\hline")
+        if e.pos_reward+e.neg_reward != last_rew_s:
+            print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & {:10.3f} & {:10.3f} & {:10.3f} ".format(e.creation_time, e.solution_time, e.creation_time+e.solution_time)+"    \\\\ \\cline{3-6}")
+            last_rew_s = e.pos_reward+e.neg_reward
+        else:
+            print("                   &                     & "+str(e.discount_factor)+" & {:10.3f} & {:10.3f} & {:10.3f} ".format(e.creation_time, e.solution_time, e.creation_time+e.solution_time)+"    \\\\ \\hline")
 
 print("\\end{tabular}")
 print("\\end{table*}")
-    
