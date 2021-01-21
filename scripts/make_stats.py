@@ -104,33 +104,50 @@ for e in entries:
         print("\\caption{Analysis of "+sz+" "+scene_name+"}")
         print("\\label{table:"+scene_name+"_"+sz+"}")
         print("\\centering")
-        print("\\begin{tabular}{|c|c|c|c|c|c|}")
+        print("\\begin{tabular}{|c|c|c|c|}")
         print("\\hline")
 
         print("\\multicolumn{2}{|c|}{Rewards} &")
         print("  \\multirow{2}{*}{\\begin{tabular}[c]{@{}c@{}}Discount\\\\ factor\\end{tabular}} &")
-        print("  \\multicolumn{3}{c|}{Time taken (in sec.)} \\\\ \cline{1-2} \\cline{4-6} ")
-        print("Positive &")
-        print("  Negative &")
-        print("   &")
-        print("  \\begin{tabular}[c]{@{}c@{}}Game creation\\\\ (GC)\\end{tabular} &")
-        print("  \\begin{tabular}[c]{@{}c@{}}Game solving\\\\ (GS)\\end{tabular} &")
-        print("  \\begin{tabular}[c]{@{}c@{}}Total time\\\\ (GC+GS)\\end{tabular} \\\\ \hline")
+        print("  \\multirow{2}{*}{\\begin{tabular}[c]{@{}}Total\\\\ time(s)\\end{tabular}} \\\\")
+
+        # print(" Total time \\\\ \\hline")
+
+        # print("  \\multicolumn{3}{c|}{Time taken (in sec.)} \\\\ \cline{1-2} \\cline{4-6} ")
+        print("Positive & Negative & & \\\\ \\hline")
+        # print("  Negative &")
+        # print("   &  & \\\\ \\hline")
+        # #print("  \\begin{tabular}[c]{@{}c@{}}Game creation\\\\ (GC)\\end{tabular} &")
+        # #print("  \\begin{tabular}[c]{@{}c@{}}Game solving\\\\ (GS)\\end{tabular} &")
+        # print("  \\begin{tabular}[c]{@{}c@{}}Total time\\\\ (GC+GS)\\end{tabular} \\\\ \hline")
         last_sz = sz
 
-    
+
     if e.creation_time < 0:
         if e.pos_reward+e.neg_reward != last_rew_s:
-            print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & --- & --- & --- "+"    \\\\ \\cline{3-6}")
+            print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & --- "+"    \\\\ \\cline{3-4}")
             last_rew_s = e.pos_reward+e.neg_reward
         else:
-            print("                   &                     & "+str(e.discount_factor)+" & --- & --- & --- "+"    \\\\ \\hline")
+            print("                   &                     & "+str(e.discount_factor)+" & --- "+"    \\\\ \\hline")
     else:
         if e.pos_reward+e.neg_reward != last_rew_s:
-            print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & {:10.3f} & {:10.3f} & {:10.3f} ".format(e.creation_time, e.solution_time, e.creation_time+e.solution_time)+"    \\\\ \\cline{3-6}")
+            print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & {:10.3f} ".format(e.creation_time+e.solution_time)+"    \\\\ \\cline{3-4}")
             last_rew_s = e.pos_reward+e.neg_reward
         else:
-            print("                   &                     & "+str(e.discount_factor)+" & {:10.3f} & {:10.3f} & {:10.3f} ".format(e.creation_time, e.solution_time, e.creation_time+e.solution_time)+"    \\\\ \\hline")
+            print("                   &                     & "+str(e.discount_factor)+" & {:10.3f} ".format(e.creation_time+e.solution_time)+"    \\\\ \\hline")
+    
+    # if e.creation_time < 0:
+    #     if e.pos_reward+e.neg_reward != last_rew_s:
+    #         print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & --- & --- & --- "+"    \\\\ \\cline{3-6}")
+    #         last_rew_s = e.pos_reward+e.neg_reward
+    #     else:
+    #         print("                   &                     & "+str(e.discount_factor)+" & --- & --- & --- "+"    \\\\ \\hline")
+    # else:
+    #     if e.pos_reward+e.neg_reward != last_rew_s:
+    #         print("\\multirow{2}{*}{"+str(e.pos_reward)+"} & \multirow{2}{*}{"+str(e.neg_reward)+"} & "+str(e.discount_factor)+" & {:10.3f} & {:10.3f} & {:10.3f} ".format(e.creation_time, e.solution_time, e.creation_time+e.solution_time)+"    \\\\ \\cline{3-6}")
+    #         last_rew_s = e.pos_reward+e.neg_reward
+    #     else:
+    #         print("                   &                     & "+str(e.discount_factor)+" & {:10.3f} & {:10.3f} & {:10.3f} ".format(e.creation_time, e.solution_time, e.creation_time+e.solution_time)+"    \\\\ \\hline")
 
 print("\\end{tabular}")
 print("\\end{table*}")

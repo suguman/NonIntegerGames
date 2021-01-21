@@ -1,5 +1,5 @@
 width = 3
-length = 5 # We use the last row to denote objects the human can place next turn
+length = 4 # We use the last row to denote objects the human can place next turn
 #Really we should only use one location for this
 
 speed = 1 #We always assume this is 1
@@ -34,4 +34,5 @@ class Location:
         return self.row == other.row and self.col == other.col
 
 
-initial_state_list = [Location(1,0), Location(1,3)] #always start here
+# initial_state_list = [Location(1,0), Location(2,1), Location(1,2)] #always start here
+initial_state_list = [Location(1,0), Location(1,2)] #always start here

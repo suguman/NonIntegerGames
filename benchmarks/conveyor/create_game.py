@@ -5,6 +5,8 @@ import copy
 
 import sys
 
+avoid_human_blocks = False
+
 class State:
     obj_locs = []
     human_turn = False
@@ -125,6 +127,8 @@ def gen_state_for_new_robot_loc(state, new_loc):
     for i in range(len(state.obj_locs)):
         if state.obj_locs[i].row < length-1:
             new_obj_locs[i].row = state.obj_locs[i].row+1
+            if(i == 2 and new_obj_locs[i].row == length-1):#no neighbs for dropped block 3
+                return []
 
     for i in range(len(state.obj_locs)):
         if state.obj_locs[i] == new_loc:
@@ -153,11 +157,15 @@ def is_valid_loc(human_loc, robot_loc):
     if human_loc.row == robot_loc.row:
         if human_loc.col <= robot_loc.col:
             return False
+
+    if(avoid_human_blocks):
+        if abs(human_loc.row - robot_loc.row) < 2:
+            if abs(human_loc.col - robot_loc.col):
+                return False
+    
     return True
 
 def get_potential_neighbor_locs(state):
-    print(positive_reward)
-    print(length)
 
     pot_locs = []
     if state.human_turn:
@@ -266,14 +274,14 @@ def main():
     print("# states")
     for s in game_states:
         state_to_int_map[s.to_int()] = counter
-        counter += 1
         i = 1
         if s.human_turn:
             i = 0
         if s.is_reachability_goal:
-            print(str(counter)+" "+str(i)+ " r")
+            print(str(counter)+" "+str(i)+ " R")
         else:
             print(str(counter)+" "+str(i))
+        counter += 1
 
     print("# initial state")
     print(state_to_int_map[initial_state.to_int()])
